@@ -30,8 +30,8 @@ namespace EtherpunkInventoryManagement
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddEntityFrameworkSqlite().AddDbContext<InventoryDbContext>();
-            services.AddEntityFrameworkNpgsql().AddDbContext<InventoryDbContext>();
+            services.AddEntityFrameworkSqlite().AddDbContext<InventoryDbContext>(); // For Sqlite
+            //services.AddEntityFrameworkNpgsql().AddDbContext<InventoryDbContext>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

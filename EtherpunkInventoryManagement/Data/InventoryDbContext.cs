@@ -21,8 +21,8 @@ namespace EtherpunkInventoryManagement.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlite("Data Source=InventoryDb.sqlite3"); // For Sqlite
-            optionsBuilder.UseNpgsql("Host=127.0.0.1;Database=epim;Username=epim;Password=epim");
+            optionsBuilder.UseSqlite("Data Source=InventoryDb.sqlite3"); // For Sqlite
+            //optionsBuilder.UseNpgsql("Host=127.0.0.1;Database=epim;Username=epim;Password=epim");
         }
 
         protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder builder)
