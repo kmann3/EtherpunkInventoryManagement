@@ -77,7 +77,29 @@ namespace EtherpunkInventoryManagement.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    var _userManager = _signInManager.UserManager;
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        return LocalRedirect("~/AdminDashboard");
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "Superviser"))
+                    {
+                        return LocalRedirect("~/SuperviserDashboard");
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "Tech"))
+                    {
+                        return LocalRedirect("~/TechDashboard");
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "User"))
+                    {
+                        return LocalRedirect("~/UserDashboard");
+                    }
+                    else
+                    {
+                        return LocalRedirect(returnUrl);
+                    }
                 }
                 if (result.RequiresTwoFactor)
                 {
