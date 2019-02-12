@@ -40,6 +40,31 @@ namespace EtherpunkInventoryManagement.Controllers
         public IActionResult TechDashboard()
         {
             Home_TechDashboardModel returnModel = new Home_TechDashboardModel();
+            /*CREATE VIEW[V_RecentlyEnteredItem]
+AS
+    SELECT Inventories.InventoryId, Inventories.ShortId, InventoryTemplates.InventoryTemplateId, InventoryTemplates.Name AS InventoryTemplateName,  Inventories.Name AS InventoryName, AssignedTo.Id AS AssignedToUserId, AssignedTo.FirstName As AssignedToUsernameFirstName,
+        AssignedTo.LastName AS AssignedToUsernameLastName, AssignedBy.Id AS AssignedByUserId, AssignedBy.FirstName As AssignedByUsernameFirstName, AssignedBy.LastName AS AssignedByUsernameLastName, InventoryAssignmentHistories.CreatedOn AS AssignedToDate
+    FROM Inventories
+        INNER JOIN InventoryAssignmentHistories ON InventoryAssignmentHistories.InventoryId = Inventories.InventoryId
+        INNER JOIN InventoryTemplates ON InventoryTemplates.InventoryTemplateId = Inventories.InventoryTemplateId
+        INNER JOIN AspNetUsers AssignedTo ON AssignedTo.Id = InventoryAssignmentHistories.AssignedTo_UserId
+        INNER JOIN AspNetUsers AssignedBy ON AssignedBy.Id = InventoryAssignmentHistories.AssignedBy_UserId
+    WHERE Inventories.IsDeleted = 0*/
+            var foo = (from hi in _context.HardwareInventories
+                       join hiah in _context.HardwareInventoryAssignmentHistories on hi.Id equals hiah.HardwareInventoryId
+                       join hlo in _context.HardwareLayouts on hi.HardwareLayoutId equals hlo.Id
+                       join userTo in _context.ApplicationUsers on hiah.AssignedTo_UserId equals userTo.Id
+                       join userBy in _context.ApplicationUsers on hiah.AssignedBy_UserId equals userBy.Id
+                       select new { HardwareInventoryId = hi.Id, HardwareInventoryShortId = hi.ShortId, HardwareLayoutId = hlo.Id })
+                       .ToList();
+
+            foreach(var f in foo)
+            {
+                returnModel.RecentlyEnteredHardwareInventories.Add(new Home_TechDashboardModel.RecentlyEnteredHardwareInventory()
+                {
+                    HardwareInventoryId = f.HardwareInventoryId
+                });
+            }
             return View(returnModel);
         }
 
