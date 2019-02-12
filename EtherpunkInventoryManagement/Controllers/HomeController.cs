@@ -39,7 +39,7 @@ namespace EtherpunkInventoryManagement.Controllers
         [Authorize(Roles = "Admin,Superviser,Tech")]
         public IActionResult TechDashboard()
         {
-            Models.Home_TechDashboardModel returnModel = new Home_TechDashboardModel();
+            Home_TechDashboardModel returnModel = new Home_TechDashboardModel();
             return View(returnModel);
         }
 
