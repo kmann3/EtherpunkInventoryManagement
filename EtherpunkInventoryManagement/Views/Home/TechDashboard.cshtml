@@ -1,4 +1,4 @@
-﻿
+﻿@model EtherpunkInventoryManagement.Models.Home_TechDashboardModel
 @{
     ViewData["Title"] = "TechDashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,3 +6,226 @@
 
 <h1>TechDashboard</h1>
 
+@if (TempData["UserMessage"] != null)
+{
+    var message = (MessageModel)TempData["UserMessage"];
+    <div class="alert alert-@message.CssClassName.ToString().ToLower() alert-dismissable" role="alert">
+        <button type="button" class="close" data-dismiss="alert">
+            <span area-hidden="true">&times;</span><span class="sr-only">Close</span>
+        </button>
+        <strong>@message.Title</strong><br />
+        @message.Message
+    </div>
+    if (message.EndPageProcessing == true)
+    {
+        return;
+    }
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2>Recently Entered Items</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Item</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.UnvalidatedItems == null || Model.UnvalidatedItems.Count == 0)
+                {
+                    <tr><td colspan="4">No new items recently entered!</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.RecentlyEnteredHardwareInventories)
+                    {
+                        <tr>
+                            <td>
+                                <a href="Inventory/Details/@item.ShortHardwareInventoryId">@item.ShortHardwareInventoryId</a>
+                            </td>
+                            <td>
+                                @item.CreatedOn
+                            </td>
+                            <td>
+                                <a href="User/Details/@item.CreatedById">@item.CreatedByUsername</a> -> <a href="User/Details/@item.AssignedToId">@item.AssignedToUsername</a>
+                            </td>
+                            <td>
+                                @if (item.HardwareInventoryName != null && item.HardwareInventoryName.Length > 0)
+                                {
+                                    <a href="Asset/Types/@item.HardwareLayoutId">@item.HardwareInventoryName (@item.HardwareLayoutName)</a>
+                                }
+                                else
+                                {
+                                    <a href="Asset/Types/@item.HardwareLayoutId">@item.HardwareLayoutName</a>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <h2>Late Validations</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Deadline</th>
+                    <th>User</th>
+                    <th>Item Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.UnvalidatedItems == null || Model.UnvalidatedItems.Count == 0)
+                {
+                    <tr><td colspan="4">All Items Validated On Time!</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.UnvalidatedItems)
+                    {
+                        <tr class="bg-warning">
+                            <td>
+                                <a href="Inventory/Details/@item.HardwareShortId">@item.HardwareShortId</a>
+                            </td>
+                            <td>@item.ExpectedCompletionDate</td>
+                            <td>
+                                @if (item.HardwareInventoryOwnerName != item.AssignedUserName)
+                                {<text>Assigned To:</text>} <a href="User/Index/@item.HardwareInventoryOwnerId">@item.HardwareInventoryOwnerName</a>
+                                @if (item.HardwareInventoryOwnerName != item.AssignedUserName)
+                                {
+                                    <text>Validating by:</text><a href="/User/Index/@item.AssignedUserId">@item.AssignedUserName</a>
+                                }
+                            </td>
+                            <td>
+                                @if (item.HardwareInventoryName != null && item.HardwareInventoryName.Length > 0)
+                                {
+                                    @item.HardwareInventoryName
+                                }
+                                else
+                                {
+                                    @item.HardwareLayoutName
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if (Model.UnvalidatedItems != null && Model.UnvalidatedItems.Count > 5)
+        {
+            <p><a class="btn btn-default" href="#">More &raquo;</a></p>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <h2>Recent User Validated Items</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date Validated</th>
+                    <th>User</th>
+                    <th>Item Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.UserValidatedItems == null || Model.UserValidatedItems.Count == 0)
+                {
+                    <tr><td colspan="4">Nothing recent to be shown.</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.UserValidatedItems)
+                    {
+                        <tr>
+                            <td>
+                                <a href="Inventory/Details/@item.HardwareShortId">@item.HardwareShortId</a>
+                            </td>
+                            <td>@item.ActualCompletionDate</td>
+                            <td>
+                                Assigned: <a href="User/Index/@item.HardwareInventoryOwnerId">@item.HardwareInventoryOwnerName</a> @if (item.HardwareInventoryOwnerName != item.AssignedUserName)
+                                {<a href="/User/Index/@item.AssignedUserId">@item.AssignedUserName</a>}
+                            </td>
+                            <td>
+                                @if (item.HardwareInventoryName != null && item.HardwareInventoryName.Length > 0)
+                                {
+                                    @item.HardwareInventoryName
+                                }
+                                else
+                                {
+                                    @item.HardwareLayoutName
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+        </table>
+        @if (Model.UserValidatedItems != null && Model.UserValidatedItems.Count > 5)
+        {
+            <p><a class="btn btn-default" href="#">More &raquo;</a></p>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <h2>Formal Validations</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date Validated</th>
+                    <th>User</th>
+                    <th>Item Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ITValidatedItems == null || Model.ITValidatedItems.Count == 0)
+                {
+                    <tr><td colspan="4">Nothing recent to be shown.</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.ITValidatedItems)
+                    {
+                    <tr>
+                        <td>
+                            <a href="Inventory/Details/@item.HardwareShortId">@item.HardwareShortId</a>
+                        </td>
+                        <td>@item.ActualCompletionDate</td>
+                        <td>
+                            Assigned: <a href="User/Index/@item.HardwareInventoryOwnerId">@item.HardwareInventoryOwnerName</a> @if (item.HardwareInventoryOwnerName != item.AssignedUserName)
+                            {<a href="/User/Index/@item.AssignedUserId">@item.AssignedUserName</a>}
+                        </td>
+                        <td>
+                            @if (item.HardwareInventoryName != null && item.HardwareInventoryName.Length > 0)
+                            {
+                                @item.HardwareInventoryName
+                            }
+                            else
+                            {
+                                @item.HardwareLayoutName
+                            }
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if (Model.ITValidatedItems != null && Model.ITValidatedItems.Count > 5)
+        {
+            <p><a class="btn btn-default" href="#">More &raquo;</a></p>
+        }
+    </div>
+</div>
