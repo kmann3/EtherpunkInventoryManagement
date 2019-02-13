@@ -17,6 +17,90 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="~/TechDashboard">Dashboard <span class="sr-only">(current)</span></a>
+                    </li>
+                    <!-- INVENTORY -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Inventory</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="/Inventory/Create">Create New Item</a>
+                            <a class="dropdown-item" href="/Inventory/MassCreate">Mass Create Items</a>
+                            <a class="dropdown-item" href="/Inventory/Reassign">Reassign Item</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/Inventory/Dispose">Dispose Item</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/Inventory/Delete">Delete Item</a>
+                        </div>
+                    </li>
+
+                    <!-- USERS -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">User</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="/User/Create">Create User</a>
+                            <a class="dropdown-item" href="/User/Index">User List</a>
+                        </div>
+                    </li>
+
+                    <!-- REPORTS -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="/Report/RecentlyAssignedItems">Recently Assigned Items</a>
+                            <a class="dropdown-item" href="/Report/DisposedItems">Disposed Items</a>
+                            <a class="dropdown-item" href="/Report/DeletedItems">Deleted Items</a>
+                            <a class="dropdown-item" href="/Report/OrphanedItems">Orphaned Items</a>
+                            <a class="dropdown-item" href="/Report/UserHistory">User History</a>
+                            <a class="dropdown-item" href="/Report/ItemAssignmentHistory">Item Assignment History</a>
+                            <a class="dropdown-item" href="/Report/ItemFullReport">Item Full Report</a>
+                            <a class="dropdown-item" href="/Report/VendorList">Vendor List</a>
+                            <a class="dropdown-item" href="/Report/UserAudit">User Audit</a>
+                            <a class="dropdown-item" href="/Report/ITAudit">IT Audit</a>
+                            <a class="dropdown-item" href="/Report/ImportantActionItems">Important Action Items</a>
+                        </div>
+                    </li>
+
+                    <!-- VENDORS -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Vendors</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="/Vendor/Index">Vendor List</a>
+                            <a class="dropdown-item" href="/Vendor/Create">Create Vendor</a>
+                        </div>
+                    </li>
+
+
+                    <!-- SETTINGS -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="/Settings/Index">General</a>
+                            <a class="dropdown-item" href="/Settings/Ldap">Active Directory / LDAP</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Home/RoadMap">Road Map</a>
+                    </li>
+                </ul>
+            </div>
+            <form action="/Home/Search" class="form-inline" method="post">
+                <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            
+            <partial name="_LoginPartial" />
+
+        </nav>
+    </header>
     <div class="container">
         <partial name="_CookieConsentPartial" />
         <main role="main" class="pb-3">
