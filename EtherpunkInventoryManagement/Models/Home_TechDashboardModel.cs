@@ -16,16 +16,16 @@ namespace EtherpunkInventoryManagement.Models
         public class RecentlyEnteredHardwareInventory
         {
             public string HardwareInventoryId { get; set; }
-            public string ShortHardwareInventoryId { get; set; }
+            public string HardwareInventoryShortId { get; set; }
             public string HardwareInventoryName { get; set; }
             public string HardwareLayoutId { get; set; }
             public string HardwareLayoutName { get; set; }
             [DisplayFormat(DataFormatString = "{0:dddd, dd MMMM yyyy}", ApplyFormatInEditMode = true)]
-            public DateTime CreatedOn { get; set; }
-            public string CreatedById { get; set; }
-            public string CreatedByUsername { get; set; }
+            public DateTime AssignedOnDate { get; set; }
+            public string AssignedById { get; set; }
+            public string AssignedByFullName { get; set; }
             public string AssignedToId { get; set; }
-            public string AssignedToUsername { get; set; }
+            public string AssignedToFullName { get; set; }
         }
 
         public class ValidatedHardwareInventory
