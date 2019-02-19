@@ -51,28 +51,28 @@ AS
         INNER JOIN AspNetUsers AssignedTo ON AssignedTo.Id = InventoryAssignmentHistories.AssignedTo_UserId
         INNER JOIN AspNetUsers AssignedBy ON AssignedBy.Id = InventoryAssignmentHistories.AssignedBy_UserId
     WHERE Inventories.IsDeleted = 0*/
-            var top5RecentlyEnteredItems = (from hi in _context.HardwareInventories
-                                            join hiah in _context.HardwareInventoryAssignmentHistories on hi.Id equals hiah.HardwareInventoryId
-                                            join hlo in _context.HardwareLayouts on hi.HardwareLayoutId equals hlo.Id
-                                            join userTo in _context.ApplicationUsers on hiah.AssignedTo_UserId equals userTo.Id
-                                            join userBy in _context.ApplicationUsers on hiah.AssignedBy_UserId equals userBy.Id
-                                            where hi.IsDeleted == false
-                                            orderby hiah.CreatedOn descending
-                                            select new
-                                            {
-                                                HardwareInventoryId = hi.Id,
-                                                HardwareInventoryShortId = hi.ShortId,
-                                                HardwareName = hi.Name,
-                                                HardwareLayoutId = hlo.Id,
-                                                HardwareLayoutName = hlo.Name,
-                                                AssignedToId = userTo.Id,
-                                                AssignedToFullName = userTo.FullNameFirstFirst,
-                                                AssignedById = userBy.Id,
-                                                AssignedByFullName = userBy.FullNameFirstFirst,
-                                                AssignedOnDate = hiah.CreatedOn
-                                            });
+            var topRecentlyEnteredItems = (from hi in _context.HardwareInventories
+                                           join hiah in _context.HardwareInventoryAssignmentHistories on hi.Id equals hiah.HardwareInventoryId
+                                           join hlo in _context.HardwareLayouts on hi.HardwareLayoutId equals hlo.Id
+                                           join userTo in _context.ApplicationUsers on hiah.AssignedTo_UserId equals userTo.Id
+                                           join userBy in _context.ApplicationUsers on hiah.AssignedBy_UserId equals userBy.Id
+                                           where hi.IsDeleted == false
+                                           orderby hiah.CreatedOn descending
+                                           select new
+                                           {
+                                               HardwareInventoryId = hi.Id,
+                                               HardwareInventoryShortId = hi.ShortId,
+                                               HardwareName = hi.Name,
+                                               HardwareLayoutId = hlo.Id,
+                                               HardwareLayoutName = hlo.Name,
+                                               AssignedToId = userTo.Id,
+                                               AssignedToFullName = userTo.FullNameFirstFirst,
+                                               AssignedById = userBy.Id,
+                                               AssignedByFullName = userBy.FullNameFirstFirst,
+                                               AssignedOnDate = hiah.CreatedOn
+                                           });
 
-            foreach(var item in top5RecentlyEnteredItems.Take(5))
+            foreach (var item in topRecentlyEnteredItems.Take(5))
             {
                 returnModel.RecentlyEnteredHardwareInventories.Add(new Home_TechDashboardModel.RecentlyEnteredHardwareInventory()
                 {
@@ -88,6 +88,39 @@ AS
                     AssignedByFullName = item.AssignedByFullName
                 });
             }
+
+            var unvalidatedItems = (from au in _context.HardwareAudits
+                                    join inventory in _context.HardwareInventories on au.HardwareInventoryId equals inventory.Id
+                                    join assigneduser in _context.ApplicationUsers on au.AssignedUserId equals assigneduser.Id
+                                    join auditrolelookup in _context.Lookups on au.AuditPersonRoleLookupId equals auditrolelookup.Id
+                                    join assignedowner in _context.ApplicationUsers on inventory.AssignedUserId equals assignedowner.Id
+                                    join compbyuserp1 in _context.ApplicationUsers on au.CompletedByUserId equals compbyuserp1.Id into compbyuserp2
+                                    from compbyuser in compbyuserp2.DefaultIfEmpty()
+                                    orderby au.CreatedOn descending
+                                    where au.ActualCompletionDate == null && inventory.IsDeleted == false
+                                    select new
+                                    {
+                                        Audit = au,
+                                        AssignedToUser = assigneduser,
+                                        AuditRoleLookup = auditrolelookup,
+                                        AssignedOwner = assignedowner,
+                                        HardwareInventory = inventory,
+                                        CompletedByUser = compbyuser
+                                    });
+
+            foreach(var item in unvalidatedItems.Take(6))
+            {
+                returnModel.UnvalidatedItems.Add(new Home_TechDashboardModel.UnvalidatedHardwareInventory
+                {
+                    AssignedUserId = item.AssignedToUser.Id,
+                    AssignedUserName = item.AssignedToUser.FullNameFirstFirst,
+                    AuditStartDate = item.Audit.CreatedOn,
+                    ExpectedCompletionDate = item.Audit.ExpectedCompletionDate
+                });
+            }
+
+
+
             return View(returnModel);
         }
 

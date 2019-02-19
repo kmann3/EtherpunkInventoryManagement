@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 
 namespace EtherpunkInventoryManagement.Models
 {
+
     public class MessageModel
     {
+        public List<MessageModel> MessageList = new List<MessageModel>();
+
         public string Title { get; set; }
         public string Message { get; set; }
         public CssClassType CssClassName { get; set; }
