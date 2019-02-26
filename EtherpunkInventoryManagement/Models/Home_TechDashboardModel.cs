@@ -49,6 +49,7 @@ namespace EtherpunkInventoryManagement.Models
 
             public string HardwareLayoutId { get; set; }
             public string HardwareLayoutName { get; set; }
+            public TimeSpan TimeTaken { get; set; }
         }
 
         public class UnvalidatedHardwareInventory
@@ -58,20 +59,16 @@ namespace EtherpunkInventoryManagement.Models
 
             [DisplayFormat(DataFormatString = "{0:dddd, dd MMMM yyyy}", ApplyFormatInEditMode = true)]
             public DateTime AuditStartDate { get; set; }
-
             public string AssignedUserId { get; set; }
             public string AssignedUserName { get; set; }
-
             public string HardwareInventoryId { get; set; }
             public string HardwareInventoryName { get; set; }
-
             public string HardwareShortId { get; set; }
-
             public string HardwareInventoryOwnerId { get; set; }
             public string HardwareInventoryOwnerName { get; set; }
-
             public string HardwareLayoutId { get; set; }
             public string HardwareLayoutName { get; set; }
+            public TimeSpan OverdueLength { get; set; }
         }
     }
 }

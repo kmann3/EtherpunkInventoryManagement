@@ -44,7 +44,7 @@
                 }
                 else
                 {
-                    @foreach (var item in Model.RecentlyEnteredHardwareInventories)
+                    @foreach (var item in Model.RecentlyEnteredHardwareInventories.Take(5))
                     {
                         <tr>
                             <td>
@@ -69,8 +69,12 @@
                         </tr>
                     }
                 }
-                </tbody>
+            </tbody>
         </table>
+        @if(Model.RecentlyEnteredHardwareInventories.Count() > 5)
+        {
+            <p><a class="btn btn-default" href="#">More &raquo;</a></p>
+        }
     </div>
 </div>
 <div class="row">
@@ -98,7 +102,7 @@
                             <td>
                                 <a href="Inventory/Details/@item.HardwareShortId">@item.HardwareShortId</a>
                             </td>
-                            <td>@item.ExpectedCompletionDate</td>
+                            <td>@item.ExpectedCompletionDate (@System.Math.Round(item.OverdueLength.TotalDays) days)</td>
                             <td>
                                 @if (item.HardwareInventoryOwnerName != item.AssignedUserName)
                                 {<text>Assigned To:</text>} <a href="User/Index/@item.HardwareInventoryOwnerId">@item.HardwareInventoryOwnerName</a>
@@ -153,7 +157,7 @@
                             <td>
                                 <a href="Inventory/Details/@item.HardwareShortId">@item.HardwareShortId</a>
                             </td>
-                            <td>@item.ActualCompletionDate</td>
+                            <td>@item.ActualCompletionDate (@System.Math.Round(item.TimeTaken.TotalDays) days)</td>
                             <td>
                                 Assigned: <a href="User/Index/@item.HardwareInventoryOwnerId">@item.HardwareInventoryOwnerName</a> @if (item.HardwareInventoryOwnerName != item.AssignedUserName)
                                 {<a href="/User/Index/@item.AssignedUserId">@item.AssignedUserName</a>}
@@ -205,7 +209,7 @@
                         <td>
                             <a href="Inventory/Details/@item.HardwareShortId">@item.HardwareShortId</a>
                         </td>
-                        <td>@item.ActualCompletionDate</td>
+                        <td>@item.ActualCompletionDate (@System.Math.Round(item.TimeTaken.TotalDays) days)</td>
                         <td>
                             Assigned: <a href="User/Index/@item.HardwareInventoryOwnerId">@item.HardwareInventoryOwnerName</a> @if (item.HardwareInventoryOwnerName != item.AssignedUserName)
                             {<a href="/User/Index/@item.AssignedUserId">@item.AssignedUserName</a>}

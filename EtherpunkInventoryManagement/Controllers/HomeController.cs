@@ -40,17 +40,7 @@ namespace EtherpunkInventoryManagement.Controllers
         public IActionResult TechDashboard()
         {
             Home_TechDashboardModel returnModel = new Home_TechDashboardModel();
-            /*CREATE VIEW[V_RecentlyEnteredItem]
-AS
-    SELECT Inventories.InventoryId, Inventories.ShortId, InventoryTemplates.InventoryTemplateId, InventoryTemplates.Name AS InventoryTemplateName,  
-    Inventories.Name AS InventoryName, AssignedTo.Id AS AssignedToUserId, AssignedTo.FirstName As AssignedToUsernameFirstName,
-        AssignedTo.LastName AS AssignedToUsernameLastName, AssignedBy.Id AS AssignedByUserId, AssignedBy.FirstName As AssignedByUsernameFirstName, AssignedBy.LastName AS AssignedByUsernameLastName, InventoryAssignmentHistories.CreatedOn AS AssignedToDate
-    FROM Inventories
-        INNER JOIN InventoryAssignmentHistories ON InventoryAssignmentHistories.InventoryId = Inventories.InventoryId
-        INNER JOIN InventoryTemplates ON InventoryTemplates.InventoryTemplateId = Inventories.InventoryTemplateId
-        INNER JOIN AspNetUsers AssignedTo ON AssignedTo.Id = InventoryAssignmentHistories.AssignedTo_UserId
-        INNER JOIN AspNetUsers AssignedBy ON AssignedBy.Id = InventoryAssignmentHistories.AssignedBy_UserId
-    WHERE Inventories.IsDeleted = 0*/
+            
             var topRecentlyEnteredItems = (from hi in _context.HardwareInventories
                                            join hiah in _context.HardwareInventoryAssignmentHistories on hi.Id equals hiah.HardwareInventoryId
                                            join hlo in _context.HardwareLayouts on hi.HardwareLayoutId equals hlo.Id
@@ -72,7 +62,7 @@ AS
                                                AssignedOnDate = hiah.CreatedOn
                                            });
 
-            foreach (var item in topRecentlyEnteredItems.Take(5))
+            foreach (var item in topRecentlyEnteredItems.Take(6))
             {
                 returnModel.RecentlyEnteredHardwareInventories.Add(new Home_TechDashboardModel.RecentlyEnteredHardwareInventory()
                 {
@@ -89,13 +79,12 @@ AS
                 });
             }
 
-            var unvalidatedItems = (from au in _context.HardwareAudits
+            var topUnvalidatedItems = (from au in _context.HardwareAudits
                                     join inventory in _context.HardwareInventories on au.HardwareInventoryId equals inventory.Id
                                     join assigneduser in _context.ApplicationUsers on au.AssignedUserId equals assigneduser.Id
                                     join auditrolelookup in _context.Lookups on au.AuditPersonRoleLookupId equals auditrolelookup.Id
                                     join assignedowner in _context.ApplicationUsers on inventory.AssignedUserId equals assignedowner.Id
-                                    join compbyuserp1 in _context.ApplicationUsers on au.CompletedByUserId equals compbyuserp1.Id into compbyuserp2
-                                    from compbyuser in compbyuserp2.DefaultIfEmpty()
+                                    join hardwarelayout in _context.HardwareLayouts on inventory.HardwareLayoutId equals hardwarelayout.Id
                                     orderby au.CreatedOn descending
                                     where au.ActualCompletionDate == null && inventory.IsDeleted == false
                                     select new
@@ -105,21 +94,108 @@ AS
                                         AuditRoleLookup = auditrolelookup,
                                         AssignedOwner = assignedowner,
                                         HardwareInventory = inventory,
-                                        CompletedByUser = compbyuser
+                                        HardwareLayout = hardwarelayout,
+                                        TimeLate = ((TimeSpan)(DateTime.Now - au.ExpectedCompletionDate))
                                     });
 
-            foreach(var item in unvalidatedItems.Take(6))
+            foreach(var item in topUnvalidatedItems.Take(6))
             {
                 returnModel.UnvalidatedItems.Add(new Home_TechDashboardModel.UnvalidatedHardwareInventory
                 {
                     AssignedUserId = item.AssignedToUser.Id,
                     AssignedUserName = item.AssignedToUser.FullNameFirstFirst,
                     AuditStartDate = item.Audit.CreatedOn,
-                    ExpectedCompletionDate = item.Audit.ExpectedCompletionDate
+                    ExpectedCompletionDate = item.Audit.ExpectedCompletionDate,
+                    HardwareInventoryId = item.HardwareInventory.Id,
+                    HardwareInventoryName = item.HardwareInventory.Name,
+                    HardwareInventoryOwnerId = item.AssignedOwner.Id,
+                    HardwareInventoryOwnerName = item.AssignedOwner.FullNameFirstFirst,
+                    HardwareLayoutId = item.HardwareInventory.HardwareLayoutId,
+                    HardwareLayoutName = item.HardwareLayout.Name,
+                    HardwareShortId = item.HardwareInventory.ShortId,
+                    OverdueLength = item.TimeLate
                 });
             }
 
+            var topUserValidatedItems = (from au in _context.HardwareAudits
+                                    join inventory in _context.HardwareInventories on au.HardwareInventoryId equals inventory.Id
+                                    join assigneduser in _context.ApplicationUsers on au.AssignedUserId equals assigneduser.Id
+                                    join auditrolelookup in _context.Lookups on au.AuditPersonRoleLookupId equals auditrolelookup.Id
+                                    join assignedowner in _context.ApplicationUsers on inventory.AssignedUserId equals assignedowner.Id
+                                    join hardwarelayout in _context.HardwareLayouts on inventory.HardwareLayoutId equals hardwarelayout.Id
+                                    join compbyuser in _context.ApplicationUsers on au.CompletedByUserId equals compbyuser.Id
+                                    orderby au.CreatedOn descending
+                                    where au.ActualCompletionDate != null && auditrolelookup.LookupName == "User" && inventory.IsDeleted == false
+                                    select new
+                                    {
+                                        Audit = au,
+                                        AssignedToUser = assigneduser,
+                                        AuditRoleLookup = auditrolelookup,
+                                        AssignedOwner = assignedowner,
+                                        HardwareInventory = inventory,
+                                        CompletedByUser = compbyuser,
+                                        HardwareLayout = hardwarelayout,
+                                        TimeTaken = ((TimeSpan) (au.ActualCompletionDate - au.CreatedOn))
+                                    });
 
+            foreach (var item in topUserValidatedItems.Take(6))
+            {
+                returnModel.UserValidatedItems.Add(new Home_TechDashboardModel.ValidatedHardwareInventory
+                {
+                    ActualCompletionDate = (DateTime)item.Audit.ActualCompletionDate,
+                    AssignedUserId = item.AssignedToUser.Id,
+                    AssignedUserName = item.AssignedToUser.FullNameFirstFirst,
+                    AuditStartDate = item.Audit.CreatedOn,
+                    HardwareInventoryId = item.HardwareInventory.Id,
+                    HardwareInventoryName = item.HardwareInventory.Name,
+                    HardwareInventoryOwnerId = item.AssignedOwner.Id,
+                    HardwareInventoryOwnerName = item.AssignedOwner.FullNameFirstFirst,
+                    HardwareLayoutId = item.HardwareInventory.HardwareLayoutId,
+                    HardwareLayoutName = item.HardwareLayout.Name,
+                    HardwareShortId = item.HardwareInventory.ShortId,
+                    TimeTaken = item.TimeTaken
+                });
+            }
+
+            var topITValidatedItems = (from au in _context.HardwareAudits
+                                        join inventory in _context.HardwareInventories on au.HardwareInventoryId equals inventory.Id
+                                        join assigneduser in _context.ApplicationUsers on au.AssignedUserId equals assigneduser.Id
+                                        join auditrolelookup in _context.Lookups on au.AuditPersonRoleLookupId equals auditrolelookup.Id
+                                        join assignedowner in _context.ApplicationUsers on inventory.AssignedUserId equals assignedowner.Id
+                                        join hardwarelayout in _context.HardwareLayouts on inventory.HardwareLayoutId equals hardwarelayout.Id
+                                        join compbyuser in _context.ApplicationUsers on au.CompletedByUserId equals compbyuser.Id
+                                        orderby au.CreatedOn descending
+                                        where au.ActualCompletionDate != null && auditrolelookup.LookupName != "User" && inventory.IsDeleted == false
+                                        select new
+                                        {
+                                            Audit = au,
+                                            AssignedToUser = assigneduser,
+                                            AuditRoleLookup = auditrolelookup,
+                                            AssignedOwner = assignedowner,
+                                            HardwareInventory = inventory,
+                                            CompletedByUser = compbyuser,
+                                            HardwareLayout = hardwarelayout,
+                                            TimeTaken = ((TimeSpan)(au.ActualCompletionDate - au.CreatedOn))
+                                        });
+
+            foreach (var item in topITValidatedItems.Take(6))
+            {
+                returnModel.ITValidatedItems.Add(new Home_TechDashboardModel.ValidatedHardwareInventory
+                {
+                    ActualCompletionDate = (DateTime)item.Audit.ActualCompletionDate,
+                    AssignedUserId = item.AssignedToUser.Id,
+                    AssignedUserName = item.AssignedToUser.FullNameFirstFirst,
+                    AuditStartDate = item.Audit.CreatedOn,
+                    HardwareInventoryId = item.HardwareInventory.Id,
+                    HardwareInventoryName = item.HardwareInventory.Name,
+                    HardwareInventoryOwnerId = item.AssignedOwner.Id,
+                    HardwareInventoryOwnerName = item.AssignedOwner.FullNameFirstFirst,
+                    HardwareLayoutId = item.HardwareInventory.HardwareLayoutId,
+                    HardwareLayoutName = item.HardwareLayout.Name,
+                    HardwareShortId = item.HardwareInventory.ShortId,
+                    TimeTaken = item.TimeTaken
+                });
+            }
 
             return View(returnModel);
         }

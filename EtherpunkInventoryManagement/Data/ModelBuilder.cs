@@ -700,7 +700,7 @@ namespace EtherpunkInventoryManagement.Data
             public static Lookup AuditPersonRole_User = new Lookup()
             {
                 Id = "ba42df51-8a45-42d1-abbf-f4697596d4ac",
-                LookupName = "Supervisor",
+                LookupName = "User",
                 LookupType = Lookup.LookupTypes.AuditPersonRole.ToString()
             };
 
