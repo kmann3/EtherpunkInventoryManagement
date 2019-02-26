@@ -11,6 +11,15 @@ Currently the alternatives are expensive or not very clean.
 The database chosen was SQLite but Postgre is an option in the future.
 SQLite keeps things controlled and in a small area. Until helpdesk/ticket managing happens there shuldn't be enough writes/reads to cause troubles or db locks.
 
+To recreate the database run the following:
+
+1. Delete everything inside of the Migrations folder.
+2. Delete InventoryDb.sqlite3
+3. Open up Package Manager Console inside of Visual Studio
+4. Run the following commands
+5. 1. add-migration init
+   2. update-database
+
 ## Checklist
 (need to work on this, it's a copy/paste from an old file)
 <ul>
