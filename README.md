@@ -1,4 +1,5 @@
 # EtherpunkInventoryManagement
+
 Inventory (IT - hardware/software) management system.
 
 EtherpunkInventoryManagement's (EPIM) goal is to help IT folks of smaller organizations keep track of hardware and software.
@@ -7,7 +8,13 @@ The goal is to keep it simple and not overcomplicate things while still offering
 The ability to audit and keep track of licensing is also a part of the goal.
 Currently the alternatives are expensive or not very clean.
 
+## Overview of tools
+
+Programmed in Visual Studio 2019 / C# / .NET Core 3.0.
+
+
 ## Database
+
 The database chosen was SQLite but Postgre is an option in the future.
 SQLite keeps things controlled and in a small area. Until helpdesk/ticket managing happens there shuldn't be enough writes/reads to cause troubles or db locks.
 
@@ -21,7 +28,6 @@ To recreate the database run the following:
    2. update-database
 
 ## Checklist
-(need to work on this, it's a copy/paste from an old file)
 
 * Dashboards
   * Tech
